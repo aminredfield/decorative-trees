@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Container, Typography, Grid, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import productsData from '@data/products.json';
-import ProductCard from '@entities/product/ProductCard';
+import productsData from '../data/products.json';
+import ProductCard from '../entities/product/ProductCard';
 
 const CatalogPage: React.FC = () => {
   const [sort, setSort] = useState('popular');

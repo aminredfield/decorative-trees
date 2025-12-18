@@ -1,0 +1,201 @@
+{
+  "common": {
+    "siteName": "Decorative Trees",
+    "currency": "UZS",
+    "catalog": "Catalog",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "policy": "Policy",
+    "home": "Home",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "close": "Close",
+    "clear": "Clear",
+    "apply": "Apply",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "total": "Total",
+    "qty": "Quantity",
+    "price": "Price",
+    "delete": "Delete",
+    "addToCart": "Add to Cart",
+    "details": "Details",
+    "leaveRequest": "Leave Request",
+    "consultation": "Consultation"
+  },
+  "header": {
+    "catalog": "Catalog",
+    "policy": "Policy",
+    "cart": "Cart",
+    "leaveRequest": "Leave Request"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "contacts": "Contacts",
+    "catalog": "Catalog",
+    "policy": "Privacy Policy"
+  },
+  "hero": {
+    "title": "Decorative Trees for Your Space",
+    "subtitle": "Beautify your home or office with premium live and artificial trees",
+    "toCatalog": "Go to Catalog",
+    "consultation": "Consultation",
+    "delivery": "City Delivery",
+    "selection": "Selection Assistance",
+    "guarantee": "Quality Guarantee"
+  },
+  "products": {
+    "popular": "Popular Products",
+    "viewAll": "View All Catalog",
+    "similar": "Similar Products",
+    "inStock": "In Stock",
+    "preorder": "Pre-order",
+    "outOfStock": "Out of Stock",
+    "height": "Height",
+    "diameter": "Diameter",
+    "type": "Type",
+    "material": "Material",
+    "color": "Color",
+    "care": "Care",
+    "characteristics": "Characteristics"
+  },
+  "catalog": {
+    "title": "Catalog",
+    "sort": "Sort",
+    "sortPopular": "Popular",
+    "sortPriceAsc": "Price: Low to High",
+    "sortPriceDesc": "Price: High to Low",
+    "sortNew": "New",
+    "filters": "Filters",
+    "resetFilters": "Reset Filters",
+    "priceRange": "Price Range",
+    "heightRange": "Height",
+    "availability": "Availability",
+    "empty": "No products found",
+    "emptyDesc": "Try changing filters or reset them"
+  },
+  "product": {
+    "breadcrumb": {
+      "home": "Home",
+      "catalog": "Catalog"
+    },
+    "addToCart": "Add to Cart",
+    "leaveRequest": "Leave Request for This Product",
+    "tabs": {
+      "description": "Description",
+      "delivery": "Delivery & Payment",
+      "care": "Care"
+    },
+    "deliveryText": "We deliver products in Tashkent and regions. Payment is made in cash or by transfer.",
+    "notFound": "Product not found"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Cart is empty",
+    "emptyDesc": "Add products from the catalog",
+    "toCatalog": "Go to Catalog",
+    "yourCart": "Your Cart",
+    "item": "Item",
+    "quantity": "Quantity",
+    "price": "Price",
+    "total": "Total",
+    "checkout": "Checkout"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "steps": {
+      "contacts": "Contacts",
+      "confirmation": "Confirmation"
+    },
+    "form": {
+      "name": "Name",
+      "nameRequired": "Enter your name",
+      "phone": "Phone",
+      "phoneRequired": "Enter your phone",
+      "preferredChannel": "Preferred Contact Method",
+      "comment": "Comment",
+      "agree": "I agree with",
+      "agreeRequired": "Policy agreement required"
+    },
+    "order": "Your Order",
+    "emptyCart": "Cart is empty",
+    "sending": "Sending...",
+    "send": "Send Request",
+    "success": {
+      "title": "Thank you for your request!",
+      "message": "Our manager will contact you to clarify the order details.",
+      "toHome": "Go Home"
+    }
+  },
+  "policy": {
+    "title": "Privacy Policy",
+    "content": "In this section you can place the privacy policy text and personal data processing terms. This text is a placeholder and serves only to demonstrate the page structure."
+  },
+  "contact": {
+    "title": "Leave a Request",
+    "subtitle": "We will contact you shortly",
+    "form": {
+      "name": "Name",
+      "phone": "Phone",
+      "comment": "Comment",
+      "submit": "Submit"
+    },
+    "success": "Thank you! We will contact you."
+  },
+  "advantages": {
+    "title": "Our Advantages",
+    "delivery": {
+      "title": "Fast Delivery",
+      "desc": "We deliver within 24 hours in the city"
+    },
+    "quality": {
+      "title": "Quality Guarantee",
+      "desc": "All plants are grown according to standards"
+    },
+    "selection": {
+      "title": "Selection Assistance",
+      "desc": "Our specialists will help you choose the perfect tree"
+    },
+    "care": {
+      "title": "Care Consultation",
+      "desc": "Detailed care recommendations for each plant"
+    }
+  },
+  "howToOrder": {
+    "title": "How to Order",
+    "step1": {
+      "title": "Choose a Product",
+      "desc": "Browse the catalog and select your favorite trees"
+    },
+    "step2": {
+      "title": "Leave a Request",
+      "desc": "Fill out the form with contact information"
+    },
+    "step3": {
+      "title": "Receive Delivery",
+      "desc": "Manager will clarify details and deliver the order"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": {
+      "question": "How fast do you deliver?",
+      "answer": "We deliver within 24 hours in Tashkent. For regions, delivery takes 2-3 days."
+    },
+    "q2": {
+      "question": "What warranty on plants?",
+      "answer": "We provide a 30-day warranty on all live plants when following care recommendations."
+    },
+    "q3": {
+      "question": "Can I return a product?",
+      "answer": "Yes, you can return the product within 14 days if it has not been used and the appearance is preserved."
+    },
+    "q4": {
+      "question": "Do you have artificial trees?",
+      "answer": "Yes, our catalog includes both live and premium quality artificial decorative trees."
+    }
+  }
+}

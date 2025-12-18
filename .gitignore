@@ -713,7 +713,7 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,visualstudiocode,visualstudio,node,windows,macos,linux
-
+package-lock.json
 .env
 .env.*
 !.env.example

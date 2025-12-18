@@ -1,0 +1,201 @@
+{
+  "common": {
+    "siteName": "Dekorativ daraxtlar",
+    "currency": "so'm",
+    "catalog": "Katalog",
+    "cart": "Savat",
+    "checkout": "Buyurtma berish",
+    "policy": "Siyosat",
+    "home": "Bosh sahifa",
+    "back": "Orqaga",
+    "next": "Keyingi",
+    "submit": "Yuborish",
+    "cancel": "Bekor qilish",
+    "close": "Yopish",
+    "clear": "Tozalash",
+    "apply": "Qo'llash",
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "success": "Muvaffaqiyatli",
+    "total": "Jami",
+    "qty": "Miqdor",
+    "price": "Narx",
+    "delete": "O'chirish",
+    "addToCart": "Savatga",
+    "details": "Batafsil",
+    "leaveRequest": "So'rov qoldirish",
+    "consultation": "Konsultatsiya"
+  },
+  "header": {
+    "catalog": "Katalog",
+    "policy": "Siyosat",
+    "cart": "Savat",
+    "leaveRequest": "So'rov qoldirish"
+  },
+  "footer": {
+    "rights": "Barcha huquqlar himoyalangan",
+    "contacts": "Kontaktlar",
+    "catalog": "Katalog",
+    "policy": "Maxfiylik siyosati"
+  },
+  "hero": {
+    "title": "Sizning makoningiz uchun dekorativ daraxtlar",
+    "subtitle": "Uy yoki ofisni premium sinf jonli va sun'iy daraxtlar bilan bezang",
+    "toCatalog": "Katalogga o'tish",
+    "consultation": "Konsultatsiya",
+    "delivery": "Shahar bo'ylab yetkazib berish",
+    "selection": "Tanlashda yordam",
+    "guarantee": "Sifat kafolati"
+  },
+  "products": {
+    "popular": "Ommabop mahsulotlar",
+    "viewAll": "Barcha katalogni ko'rish",
+    "similar": "O'xshash mahsulotlar",
+    "inStock": "Mavjud",
+    "preorder": "Oldindan buyurtma",
+    "outOfStock": "Mavjud emas",
+    "height": "Balandlik",
+    "diameter": "Diametr",
+    "type": "Turi",
+    "material": "Material",
+    "color": "Rang",
+    "care": "Parvarish",
+    "characteristics": "Xususiyatlar"
+  },
+  "catalog": {
+    "title": "Katalog",
+    "sort": "Saralash",
+    "sortPopular": "Ommabop",
+    "sortPriceAsc": "Arzonroq",
+    "sortPriceDesc": "Qimmatroq",
+    "sortNew": "Yangi",
+    "filters": "Filtrlar",
+    "resetFilters": "Filtrlarni tiklash",
+    "priceRange": "Narx oralig'i",
+    "heightRange": "Balandlik",
+    "availability": "Mavjudlik",
+    "empty": "Mahsulotlar topilmadi",
+    "emptyDesc": "Filtrlarni o'zgartirib ko'ring yoki ularni tiklang"
+  },
+  "product": {
+    "breadcrumb": {
+      "home": "Bosh sahifa",
+      "catalog": "Katalog"
+    },
+    "addToCart": "Savatga qo'shish",
+    "leaveRequest": "Ushbu mahsulot bo'yicha so'rov qoldirish",
+    "tabs": {
+      "description": "Ta'rif",
+      "delivery": "Yetkazib berish va to'lov",
+      "care": "Parvarish"
+    },
+    "deliveryText": "Biz mahsulotlarni Toshkent va viloyatlar bo'yicha yetkazib beramiz. To'lov naqd yoki o'tkazma orqali amalga oshiriladi.",
+    "notFound": "Mahsulot topilmadi"
+  },
+  "cart": {
+    "title": "Savat",
+    "empty": "Savat bo'sh",
+    "emptyDesc": "Katalogdan mahsulotlar qo'shing",
+    "toCatalog": "Katalogga o'tish",
+    "yourCart": "Sizning savatingiz",
+    "item": "Mahsulot",
+    "quantity": "Miqdor",
+    "price": "Narx",
+    "total": "Jami",
+    "checkout": "Buyurtma berish"
+  },
+  "checkout": {
+    "title": "Buyurtmani rasmiylashtirish",
+    "steps": {
+      "contacts": "Kontaktlar",
+      "confirmation": "Tasdiqlash"
+    },
+    "form": {
+      "name": "Ism",
+      "nameRequired": "Ismni kiriting",
+      "phone": "Telefon",
+      "phoneRequired": "Telefonni kiriting",
+      "preferredChannel": "Muloqot usuli",
+      "comment": "Izoh",
+      "agree": "Men roziman",
+      "agreeRequired": "Siyosat bilan rozilik kerak"
+    },
+    "order": "Sizning buyurtmangiz",
+    "emptyCart": "Savat bo'sh",
+    "sending": "Yuborilmoqda...",
+    "send": "So'rovni yuborish",
+    "success": {
+      "title": "So'rovingiz uchun rahmat!",
+      "message": "Menejerimiz tafsilotlarni aniqlash uchun siz bilan bog'lanadi.",
+      "toHome": "Bosh sahifaga"
+    }
+  },
+  "policy": {
+    "title": "Maxfiylik siyosati",
+    "content": "Ushbu bo'limda siz maxfiylik siyosati matni va shaxsiy ma'lumotlarni qayta ishlash shartlarini joylashtira olasiz. Bu matn faqat sahifa tuzilmasini namoyish qilish uchun xizmat qiladi."
+  },
+  "contact": {
+    "title": "So'rov qoldiring",
+    "subtitle": "Biz tez orada siz bilan bog'lanamiz",
+    "form": {
+      "name": "Ism",
+      "phone": "Telefon",
+      "comment": "Izoh",
+      "submit": "Yuborish"
+    },
+    "success": "Rahmat! Biz siz bilan bog'lanamiz."
+  },
+  "advantages": {
+    "title": "Bizning afzalliklarimiz",
+    "delivery": {
+      "title": "Tez yetkazib berish",
+      "desc": "Shahar bo'ylab 24 soat ichida yetkazib beramiz"
+    },
+    "quality": {
+      "title": "Sifat kafolati",
+      "desc": "Barcha o'simliklar standartlarga rioya qilingan holda yetishtirilgan"
+    },
+    "selection": {
+      "title": "Tanlashda yordam",
+      "desc": "Mutaxassislarimiz ideal daraxtni tanlashda yordam beradi"
+    },
+    "care": {
+      "title": "Parvarish bo'yicha maslahat",
+      "desc": "Har bir o'simlik uchun batafsil parvarish tavsiyelari"
+    }
+  },
+  "howToOrder": {
+    "title": "Qanday buyurtma berish",
+    "step1": {
+      "title": "Mahsulotni tanlang",
+      "desc": "Katalogni ko'rib chiqing va yoqqan daraxtlarni tanlang"
+    },
+    "step2": {
+      "title": "So'rov qoldiring",
+      "desc": "Kontakt ma'lumotlari bilan shaklni to'ldiring"
+    },
+    "step3": {
+      "title": "Yetkazib berishni oling",
+      "desc": "Menejer tafsilotlarni aniqlab, buyurtmani yetkazadi"
+    }
+  },
+  "faq": {
+    "title": "Tez-tez beriladigan savollar",
+    "q1": {
+      "question": "Qanchalik tez yetkazib berasiz?",
+      "answer": "Toshkent shahri bo'ylab 24 soat ichida yetkazib beramiz. Viloyatlar uchun 2-3 kun."
+    },
+    "q2": {
+      "question": "O'simliklarga qanday kafolat?",
+      "answer": "Parvarish bo'yicha tavsiyalarga rioya qilinganda barcha jonli o'simliklarga 30 kunlik kafolat beramiz."
+    },
+    "q3": {
+      "question": "Mahsulotni qaytarish mumkinmi?",
+      "answer": "Ha, agar mahsulot ishlatilmagan va tovar ko'rinishi saqlab qolingan bo'lsa, 14 kun ichida qaytarishingiz mumkin."
+    },
+    "q4": {
+      "question": "Sun'iy daraxtlar bormi?",
+      "answer": "Ha, bizning katalogda jonli va premium sifatli sun'iy dekorativ daraxtlar mavjud."
+    }
+  }
+}

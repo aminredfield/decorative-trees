@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Container, Typography, Breadcrumbs, Button, Chip, Divider, Tabs, Tab } from '@mui/material';
-import productsData from '@data/products.json';
-import { Product } from '@entities/product/types';
-import ProductGallery from '@entities/product/ProductGallery';
-import { useCartStore } from '@features/cart/cartStore';
+import productsData from '../data/products.json';
+import { Product } from '../entities/product/types';
+import ProductGallery from '../entities/product/ProductGallery';
+import { useCartStore } from '../features/cart/cartStore';
+import ProductCard from '../entities/product/ProductCard';
 
 const ProductPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
