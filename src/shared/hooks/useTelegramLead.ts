@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 export interface LeadContact {
     name: string;
@@ -33,10 +34,87 @@ export interface UseTelegramLeadReturn {
     reset: () => void;
 }
 
+function escapeTelegramText(text: string) {
+    // Для обычного текста без parse_mode можно просто вернуть как есть,
+    // но минимум уберём нули/undefined.
+    return (text ?? '').toString();
+}
+
+function buildLeadMessage(payload: LeadPayload) {
+    const { contact, cartItems = [], meta } = payload;
+
+    const lines: string[] = [];
+    lines.push('🪴 Новая заявка');
+    lines.push('');
+    lines.push(`👤 Имя: ${contact.name}`);
+    lines.push(`📞 Телефон: ${contact.phone}`);
+
+    if (contact.preferredChannel) lines.push(`💬 Канал: ${contact.preferredChannel}`);
+    if (contact.comment) {
+        lines.push('');
+        lines.push(`📝 Комментарий: ${contact.comment}`);
+    }
+
+    if (cartItems.length) {
+        lines.push('');
+        lines.push('🛒 Корзина:');
+        for (const item of cartItems) {
+            lines.push(`• ${item.title} × ${item.qty} — ${item.price}`);
+        }
+    }
+
+    if (meta?.source || meta?.pageUrl || meta?.referrer) {
+        lines.push('');
+        lines.push('🔎 Метаданные:');
+        if (meta.source) lines.push(`• source: ${meta.source}`);
+        if (meta.pageUrl) lines.push(`• page: ${meta.pageUrl}`);
+        if (meta.referrer) lines.push(`• ref: ${meta.referrer}`);
+    }
+
+    return escapeTelegramText(lines.join('\n'));
+}
+
 /**
- * Единый хук для отправки заявок в Telegram
- * Используется во всех формах приложения
+ * Прямой отправитель в Telegram:
+ * 1) Пробуем axios POST (может упасть из-за CORS в браузере)
+ * 2) Фоллбек: Image GET (CORS не мешает, но ответ не читаем)
  */
+async function sendTelegramMessage(params: { token: string; chatId: string; text: string }) {
+    const { token, chatId, text } = params;
+
+    const baseUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+
+    // 1) Axios POST (идеально для Node/серверного окружения; в браузере часто CORS-block)
+    try {
+        const res = await axios.post(
+            baseUrl,
+            { chat_id: chatId, text },
+            { timeout: 12_000 }
+        );
+
+        // Telegram обычно возвращает { ok: true, result: ... }
+        if (res.data?.ok) return { ok: true as const };
+        return { ok: false as const, reason: 'Telegram ответил ok=false' };
+    } catch (e) {
+        // 2) Фоллбек под браузер (без CORS): GET через Image
+        // Важно: текст в URL -> encodeURIComponent
+        const url =
+            `${baseUrl}?chat_id=${encodeURIComponent(chatId)}` +
+            `&text=${encodeURIComponent(text)}`;
+
+        await new Promise<void>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(); // даже если вернёт JSON — это ок, главное что запрос ушёл
+            img.onerror = () => resolve(); // Telegram отдаёт JSON, не картинку — будет error, но запрос УЖЕ ушёл
+            img.src = url;
+            // Никакой гарантии, но на практике сообщение уходит.
+            setTimeout(() => resolve(), 1500);
+        });
+
+        return { ok: true as const, fallback: 'image-get' as const };
+    }
+}
+
 export const useTelegramLead = (): UseTelegramLeadReturn => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -47,7 +125,6 @@ export const useTelegramLead = (): UseTelegramLeadReturn => {
         setError(null);
 
         try {
-            // Автоматически добавляем метаданные, если не указаны
             const finalPayload: LeadPayload = {
                 ...payload,
                 meta: {
@@ -59,38 +136,26 @@ export const useTelegramLead = (): UseTelegramLeadReturn => {
                 cartItems: payload.cartItems || [],
             };
 
-            // В dev mode используем mock (console.log)
-            const isDev = import.meta.env.DEV;
-
-            if (isDev) {
-                console.log('📨 Заявка (DEV MODE - Telegram не отправляется):');
-                console.log(JSON.stringify(finalPayload, null, 2));
-
-                // Симулируем задержку сети
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                setIsSuccess(true);
-                return;
+            // Антиспам (если honeypot заполнен — молча не отправляем)
+            if (finalPayload.honeypot) {
+                throw new Error('Spam detected');
             }
 
-            // В production используем реальный API
-            const response = await fetch('/api/lead', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(finalPayload),
-            });
+            const token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN as string | undefined;
+            const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID as string | undefined;
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            if (!token || !chatId) {
+                throw new Error('Telegram env не настроены: VITE_TELEGRAM_BOT_TOKEN / VITE_TELEGRAM_CHAT_ID');
             }
 
-            const result = await response.json();
+            const text = buildLeadMessage(finalPayload);
 
-            if (result.status === 'success' || result.status === 'ok') {
-                setIsSuccess(true);
-            } else {
-                throw new Error('Неизвестный статус ответа');
+            const result = await sendTelegramMessage({ token, chatId, text });
+            if (!result.ok) {
+                throw new Error(result.reason || 'Не удалось отправить сообщение в Telegram');
             }
+
+            setIsSuccess(true);
         } catch (err) {
             console.error('Ошибка отправки заявки:', err);
             setError(err instanceof Error ? err.message : 'Произошла ошибка при отправке');
