@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Box, Container, Typography, TextField, Button, Stepper, Step, StepLabel, Paper, FormControlLabel, Checkbox } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Container, Typography, TextField, Button, Stepper, Step, StepLabel, Paper, FormControlLabel, Checkbox, Alert } from '@mui/material';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useCartStore } from '@features/cart/cartStore';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import { useCartStore } from '../features/cart/cartStore';
+import { useTelegramLead } from '../shared/hooks/useTelegramLead';
+import SEO from '../shared/ui/SEO';
 
 interface LocationState {
   productId?: string;
@@ -13,24 +16,42 @@ const contactSchema = z.object({
   phone: z.string().min(7, 'Введите телефон'),
   preferredChannel: z.string().optional(),
   comment: z.string().optional(),
-  agree: z.literal(true),
+  agree: z.literal(true, { errorMap: () => ({ message: 'Необходимо согласие с политикой' }) }),
 });
 
 const CheckoutPage: React.FC = () => {
+  const { t } = useTranslation();
   const { items, clear } = useCartStore();
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as LocationState | undefined;
-  // if coming from product page with single product, we may prefill cart
+
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ name: '', phone: '', preferredChannel: '', comment: '', agree: false });
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    preferredChannel: '',
+    comment: '',
+    agree: false
+  });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+
+  // Используем единый хук для отправки
+  const { isSubmitting, isSuccess, error: submitError, submitLead, reset } = useTelegramLead();
+
+  // Сброс при размонтировании
+  useEffect(() => {
+    return () => reset();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+
+    // Очистка ошибки при изменении поля
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleNext = () => {
@@ -50,144 +71,220 @@ const CheckoutPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-      const payload = {
-        contact: {
-          name: form.name,
-          phone: form.phone,
-          preferredChannel: form.preferredChannel || undefined,
-          comment: form.comment || undefined,
-        },
-        cartItems: items.map((i) => ({ id: i.id, title: i.title, qty: i.qty, price: i.price })),
-        meta: {
-          pageUrl: window.location.href,
-          referrer: document.referrer,
-        },
-        honeypot: '',
-      };
-      await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      setSuccess(true);
-      clear();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSubmitting(false);
-    }
+    await submitLead({
+      contact: {
+        name: form.name,
+        phone: form.phone,
+        preferredChannel: form.preferredChannel || undefined,
+        comment: form.comment || undefined,
+      },
+      cartItems: items.map((i) => ({
+        id: i.id,
+        title: i.title,
+        qty: i.qty,
+        price: i.price
+      })),
+      meta: {
+        source: 'checkout_page',
+      },
+    });
   };
 
-  if (success) {
+  // После успешной отправки очищаем корзину и показываем результат
+  useEffect(() => {
+    if (isSuccess && items.length > 0) {
+      clear();
+    }
+  }, [isSuccess]);
+
+  if (isSuccess) {
     return (
-      <Box sx={{ py: { xs: 6, md: 8 }, textAlign: 'center' }}>
-        <Container maxWidth="sm">
-          <Typography variant="h4" gutterBottom>
-            Спасибо за вашу заявку!
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 4 }}>
-            Наш менеджер свяжется с вами для уточнения деталей заказа.
-          </Typography>
-          <Button variant="contained" onClick={() => navigate('/')}>На главную</Button>
-        </Container>
-      </Box>
+      <>
+        <SEO
+          title={t('checkout.success.title')}
+          description={t('checkout.success.message')}
+          noindex={true}
+        />
+        <Box sx={{ py: { xs: 6, md: 8 }, textAlign: 'center' }}>
+          <Container maxWidth="sm">
+            <Typography variant="h4" gutterBottom color="success.main">
+              ✓ {t('checkout.success.title')}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 4 }}>
+              {t('checkout.success.message')}
+            </Typography>
+            <Button variant="contained" onClick={() => navigate('/')}>
+              {t('checkout.success.toHome')}
+            </Button>
+          </Container>
+        </Box>
+      </>
     );
   }
 
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+
   return (
-    <Box sx={{ py: { xs: 6, md: 8 } }}>
-      <Container maxWidth="md">
-        <Typography variant="h4" gutterBottom>
-          Оформление заявки
-        </Typography>
-        <Stepper activeStep={step} sx={{ mb: 4 }}>
-          <Step><StepLabel>Контакты</StepLabel></Step>
-          <Step><StepLabel>Подтверждение</StepLabel></Step>
-        </Stepper>
-        {step === 0 && (
-          <Paper sx={{ p: 3 }}>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Имя"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              error={Boolean(errors.name)}
-              helperText={errors.name}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Телефон"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              error={Boolean(errors.phone)}
-              helperText={errors.phone}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Предпочтительный способ связи (телеграм/видео/звонок)"
-              name="preferredChannel"
-              value={form.preferredChannel}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Комментарий"
-              name="comment"
-              value={form.comment}
-              onChange={handleChange}
-              multiline
-              rows={3}
-            />
-            <FormControlLabel
-              control={<Checkbox checked={form.agree} onChange={handleChange} name="agree" />}
-              label={
-                <Typography variant="body2">
-                  Я соглашаюсь с <Link to="/policy">политикой конфиденциальности</Link>
+    <>
+      <SEO
+        title={t('checkout.title')}
+        description="Оформление заказа на декоративные деревья. Быстрая доставка по Ташкенту."
+        noindex={true}
+      />
+
+      <Box sx={{ py: { xs: 6, md: 8 } }}>
+        <Container maxWidth="md">
+          <Typography variant="h4" gutterBottom>
+            {t('checkout.title')}
+          </Typography>
+
+          <Stepper activeStep={step} sx={{ mb: 4 }}>
+            <Step><StepLabel>{t('checkout.steps.contacts')}</StepLabel></Step>
+            <Step><StepLabel>{t('checkout.steps.confirmation')}</StepLabel></Step>
+          </Stepper>
+
+          {submitError && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {submitError}
+            </Alert>
+          )}
+
+          {step === 0 && (
+            <Paper sx={{ p: 3 }}>
+              <TextField
+                fullWidth
+                margin="normal"
+                label={t('checkout.form.name')}
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                error={Boolean(errors.name)}
+                helperText={errors.name}
+                required
+              />
+              <TextField
+                fullWidth
+                margin="normal"
+                label={t('checkout.form.phone')}
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                error={Boolean(errors.phone)}
+                helperText={errors.phone}
+                required
+                placeholder="+998 90 123 45 67"
+              />
+              <TextField
+                fullWidth
+                margin="normal"
+                label={t('checkout.form.preferredChannel')}
+                name="preferredChannel"
+                value={form.preferredChannel}
+                onChange={handleChange}
+                placeholder="Telegram, WhatsApp, звонок"
+              />
+              <TextField
+                fullWidth
+                margin="normal"
+                label={t('checkout.form.comment')}
+                name="comment"
+                value={form.comment}
+                onChange={handleChange}
+                multiline
+                rows={3}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={form.agree}
+                    onChange={handleChange}
+                    name="agree"
+                    color="primary"
+                  />
+                }
+                label={
+                  <Typography variant="body2">
+                    {t('checkout.form.agree')} <Link to="/policy" target="_blank">политикой конфиденциальности</Link>
+                  </Typography>
+                }
+              />
+              {errors.agree && (
+                <Typography color="error" variant="caption" display="block" sx={{ mt: 1 }}>
+                  {errors.agree}
                 </Typography>
-              }
-            />
-            {errors.agree && <Typography color="error" variant="caption">{errors.agree}</Typography>}
-            <Box sx={{ mt: 2, textAlign: 'right' }}>
-              <Button variant="contained" onClick={handleNext}>Продолжить</Button>
-            </Box>
-          </Paper>
-        )}
-        {step === 1 && (
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>Ваш заказ</Typography>
-            {items.length === 0 ? (
-              <Typography variant="body2">Корзина пуста</Typography>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
-                {items.map((item) => (
-                  <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography>{item.title} × {item.qty}</Typography>
-                    <Typography>{(item.price * item.qty).toLocaleString()} сум</Typography>
-                  </Box>
-                ))}
+              )}
+              <Box sx={{ mt: 3, textAlign: 'right' }}>
+                <Button variant="contained" size="large" onClick={handleNext}>
+                  {t('common.next')}
+                </Button>
               </Box>
-            )}
-            <Typography variant="h6" sx={{ mb: 3 }}>
-              Итого: {items.reduce((sum, i) => sum + i.price * i.qty, 0).toLocaleString()} сум
-            </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Button variant="outlined" onClick={() => setStep(0)}>Назад</Button>
-              <Button variant="contained" onClick={handleSubmit} disabled={submitting || items.length === 0}>
-                {submitting ? 'Отправляем…' : 'Отправить заявку'}
-              </Button>
-            </Box>
-          </Paper>
-        )}
-      </Container>
-    </Box>
+            </Paper>
+          )}
+
+          {step === 1 && (
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('checkout.order')}
+              </Typography>
+
+              {items.length === 0 ? (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  {t('checkout.emptyCart')}
+                </Alert>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+                  {items.map((item) => (
+                    <Box
+                      key={item.id}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        py: 1,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Typography>{item.title} × {item.qty}</Typography>
+                      <Typography fontWeight={600}>
+                        {(item.price * item.qty).toLocaleString()} {t('common.currency')}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+
+              {items.length > 0 && (
+                <Typography variant="h6" sx={{ mb: 3, mt: 2 }}>
+                  {t('common.total')}: {total.toLocaleString()} {t('common.currency')}
+                </Typography>
+              )}
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Наш менеджер свяжется с вами в ближайшее время для уточнения деталей заказа.
+              </Typography>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setStep(0)}
+                  disabled={isSubmitting}
+                >
+                  {t('common.back')}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  size="large"
+                >
+                  {isSubmitting ? t('checkout.sending') : t('checkout.send')}
+                </Button>
+              </Box>
+            </Paper>
+          )}
+        </Container>
+      </Box>
+    </>
   );
 };
 

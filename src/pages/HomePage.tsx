@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -29,24 +29,73 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import productsData from '../data/products.json';
 import ProductCard from '../entities/product/ProductCard';
+import { useTelegramLead } from '../shared/hooks/useTelegramLead';
+import SEO from '../shared/ui/SEO';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
   const products = productsData.slice(0, 4);
+
   const [formData, setFormData] = useState({ name: '', phone: '', comment: '' });
-  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+
+  // Используем единый хук для отправки
+  const { isSubmitting, isSuccess, error, submitLead, reset } = useTelegramLead();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSnackbar({ open: true, message: t('contact.success') });
-    setFormData({ name: '', phone: '', comment: '' });
+
+    if (!formData.name || !formData.phone) {
+      setSnackbar({
+        open: true,
+        message: 'Пожалуйста, заполните обязательные поля',
+        severity: 'error'
+      });
+      return;
+    }
+
+    await submitLead({
+      contact: {
+        name: formData.name,
+        phone: formData.phone,
+        comment: formData.comment || undefined,
+      },
+      meta: {
+        source: 'home_page_contact_form',
+      },
+    });
   };
+
+  // Обработка успешной отправки
+  useEffect(() => {
+    if (isSuccess) {
+      setSnackbar({
+        open: true,
+        message: t('contact.success'),
+        severity: 'success'
+      });
+      setFormData({ name: '', phone: '', comment: '' });
+      // Сброс состояния хука через 3 секунды
+      setTimeout(() => reset(), 3000);
+    }
+  }, [isSuccess, t, reset]);
+
+  // Обработка ошибки
+  useEffect(() => {
+    if (error) {
+      setSnackbar({
+        open: true,
+        message: 'Произошла ошибка. Попробуйте позже.',
+        severity: 'error'
+      });
+    }
+  }, [error]);
 
   const advantages = [
     {
@@ -102,6 +151,15 @@ const HomePage: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="Декоративные деревья для дома и офиса | Доставка по Ташкенту"
+        description="Купить декоративные деревья в Ташкенте: бонсай, живые и искусственные растения премиум-класса. Быстрая доставка, гарантия качества, консультация специалистов."
+        keywords="декоративные деревья ташкент, бонсай купить, искусственные деревья, живые растения, топиарий, фикус бенджамина, сосна декоративная"
+        type="website"
+        image="/assets/tree1.png"
+        url="/"
+      />
+
       {/* Hero Section with Gradient Background */}
       <Box
         sx={{
@@ -133,6 +191,7 @@ const HomePage: React.FC = () => {
             <Grid item xs={12} md={6}>
               <Box sx={{ position: 'relative', zIndex: 1 }}>
                 <Typography
+                  component="h1"
                   variant="h1"
                   gutterBottom
                   sx={{
@@ -230,10 +289,10 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Popular Products */}
-      <Box sx={{ py: { xs: 8, md: 10 } }}>
+      <Box component="section" sx={{ py: { xs: 8, md: 10 } }}>
         <Container maxWidth="xl">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Typography variant="h2" gutterBottom>
+            <Typography component="h2" variant="h2" gutterBottom>
               {t('products.popular')}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
@@ -264,10 +323,10 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Advantages */}
-      <Box sx={{ py: { xs: 8, md: 10 }, bgcolor: 'background.default' }}>
+      <Box component="section" sx={{ py: { xs: 8, md: 10 }, bgcolor: 'background.default' }}>
         <Container maxWidth="xl">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Typography variant="h2" gutterBottom>
+            <Typography component="h2" variant="h2" gutterBottom>
               {t('advantages.title')}
             </Typography>
           </Box>
@@ -321,10 +380,10 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* How to Order */}
-      <Box sx={{ py: { xs: 8, md: 10 } }}>
+      <Box component="section" sx={{ py: { xs: 8, md: 10 } }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Typography variant="h2" gutterBottom>
+            <Typography component="h2" variant="h2" gutterBottom>
               {t('howToOrder.title')}
             </Typography>
           </Box>
@@ -370,10 +429,10 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* FAQ */}
-      <Box sx={{ py: { xs: 8, md: 10 }, bgcolor: 'background.default' }}>
+      <Box component="section" sx={{ py: { xs: 8, md: 10 }, bgcolor: 'background.default' }}>
         <Container maxWidth="md">
           <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Typography variant="h2" gutterBottom>
+            <Typography component="h2" variant="h2" gutterBottom>
               {t('faq.title')}
             </Typography>
           </Box>
@@ -408,10 +467,10 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Contact Form */}
-      <Box sx={{ py: { xs: 8, md: 10 } }}>
+      <Box component="section" sx={{ py: { xs: 8, md: 10 } }}>
         <Container maxWidth="sm">
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Typography variant="h2" gutterBottom>
+            <Typography component="h2" variant="h2" gutterBottom>
               {t('contact.title')}
             </Typography>
             <Typography variant="body1" color="text.secondary">
@@ -420,7 +479,11 @@ const HomePage: React.FC = () => {
           </Box>
 
           <Paper elevation={3} sx={{ p: 4 }}>
-            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
+            >
               <TextField
                 label={t('contact.form.name')}
                 name="name"
@@ -428,6 +491,7 @@ const HomePage: React.FC = () => {
                 onChange={handleInputChange}
                 required
                 fullWidth
+                disabled={isSubmitting}
               />
               <TextField
                 label={t('contact.form.phone')}
@@ -436,6 +500,8 @@ const HomePage: React.FC = () => {
                 onChange={handleInputChange}
                 required
                 fullWidth
+                disabled={isSubmitting}
+                placeholder="+998 90 123 45 67"
               />
               <TextField
                 label={t('contact.form.comment')}
@@ -445,9 +511,16 @@ const HomePage: React.FC = () => {
                 multiline
                 rows={4}
                 fullWidth
+                disabled={isSubmitting}
               />
-              <Button type="submit" variant="contained" size="large" fullWidth>
-                {t('contact.form.submit')}
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                fullWidth
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Отправка...' : t('contact.form.submit')}
               </Button>
             </Box>
           </Paper>
@@ -460,7 +533,12 @@ const HomePage: React.FC = () => {
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
