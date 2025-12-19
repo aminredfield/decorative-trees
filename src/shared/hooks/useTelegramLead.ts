@@ -59,6 +59,21 @@ export const useTelegramLead = (): UseTelegramLeadReturn => {
                 cartItems: payload.cartItems || [],
             };
 
+            // В dev mode используем mock (console.log)
+            const isDev = import.meta.env.DEV;
+
+            if (isDev) {
+                console.log('📨 Заявка (DEV MODE - Telegram не отправляется):');
+                console.log(JSON.stringify(finalPayload, null, 2));
+
+                // Симулируем задержку сети
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                setIsSuccess(true);
+                return;
+            }
+
+            // В production используем реальный API
             const response = await fetch('/api/lead', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
